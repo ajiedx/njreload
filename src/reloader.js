@@ -3,7 +3,7 @@ const http = require('http')
 const { NjFile } = require('njfile')
 const { spawn } = require('child_process')
 
-class NjReload extends NjWatch {
+class NjReloader extends NjWatch {
     constructor(dt, objx) {
         super(dt, objx)
         for (const nm in this.dt) {
@@ -80,4 +80,4 @@ class NjReload extends NjWatch {
 
 }
 
-module.exports = { NjReload, NjWatch }
+module.exports = { NjReloader, NjWatch }

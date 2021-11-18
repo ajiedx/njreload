@@ -2,7 +2,7 @@
   "name": "njreloader",
   "version": "1.0.0",
   "description": "Livereload for Nodejs and NjNest",
-  "main": "njreload.js",
+  "main": "njreloader.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
