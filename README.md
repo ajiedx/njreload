@@ -1,2 +1,2 @@
 # njreload
-Node.js Watcher for reloading njnest backend server
+Livereload for Nodejs and NjNest
