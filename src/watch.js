@@ -10,13 +10,16 @@ class NjWatch extends NjSuper {
         this.files = {}
 
         for (const nm in this.dt) {
-            this[nm] = new NjFiles(nm, this.dt[nm])
+            const options = {construct: false}
+            Object.assign(options, this.dt[nm])
+            console.log(options)
+            this[nm] = new NjFiles(nm, options)
             for (const i in this.dt[nm].dirs) {
                 const folder = this.dt[nm].dirs[i].split('/').pop()
                 this[nm].add(folder, 'dirs')
                 if(!this.scanned.includes(folder)) {
                     
-                    this.files[folder] = new NjFiles(folder)
+                    this.files[folder] = new NjFiles(folder, {construct: false})
                     this.files[folder].setDir(this.dt[nm].dirs[i], {entity: nm})
                     for (const l in this.dt[nm].ext) {
                         this.files[folder].setExt(this.dt[nm].ext[l], folder, this.rec)
