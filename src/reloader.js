@@ -9,9 +9,9 @@ class NjReloader extends NjWatch {
         for (const nm in this.dt) {
             for (const i in this.dt[nm].dirs) {
                 const folder = this.dt[nm].dirs[i].split('/').pop()
-                for (const i in this.files[folder]) {
-                    if (this.files[folder][i] instanceof NjFile) {
-                        this.files[folder][i].add([nm], 'entity')
+                for (const i in this.fls[folder]) {
+                    if (this.fls[folder][i] instanceof NjFile) {
+                        this.fls[folder][i].add([nm], 'entity')
                     }
                 }
             }

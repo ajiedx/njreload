@@ -7,40 +7,42 @@ class NjWatch extends NjSuper {
         super(dt, objx, t)
         this.rec = true
         this.scanned = []
-        this.files = {}
+        this.fls = {}
 
         for (const nm in this.dt) {
             const options = {construct: false}
             Object.assign(options, this.dt[nm])
-            console.log(options)
+
             this[nm] = new NjFiles(nm, options)
             for (const i in this.dt[nm].dirs) {
                 const folder = this.dt[nm].dirs[i].split('/').pop()
                 this[nm].add(folder, 'dirs')
                 if(!this.scanned.includes(folder)) {
                     
-                    this.files[folder] = new NjFiles(folder, {construct: false})
-                    this.files[folder].setDir(this.dt[nm].dirs[i], {entity: nm})
+                    this.fls[folder] = new NjFiles(folder, {construct: false})
+                    this.fls[folder].setDir(this.dt[nm].dirs[i], {entity: nm})
                     for (const l in this.dt[nm].ext) {
-                        this.files[folder].setExt(this.dt[nm].ext[l], folder, this.rec)
+                        this.fls[folder].setExt(this.dt[nm].ext[l], folder, this.rec)
                     }
                     this.scanned.push(folder)
                 }     
             }
         }
 
+
     }
 
     scan() {
-        for (const i in this.files) {
-            for (const l in this.files[i]) {
-                if (this.files[i][l] instanceof NjFile) {
-                    if (this.files[i][l].isEdited()) {
-                        for (const key in this.files[i][l].entity) {
-                            this[this.files[i][l].entity[key]].rsp(this.files[i][l])
+        for (const i in this.fls) {
+            for (const l in this.fls[i]) {
+                if (this.fls[i][l] instanceof NjFile) {
+                    if (this.fls[i][l].isEdited()) {
+                        for (const key in this.fls[i][l].entity) {
+
+                            this[this.fls[i][l].entity[key]].rsp(this.fls[i][l])
                         }
                     }
-                    this.files[i][l].updateTime()
+                    this.fls[i][l].updateTime()
                 }
             }
         }
