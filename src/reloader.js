@@ -1,21 +1,31 @@
 const { NjWatch } = require('./watch')
 const http = require('http')
-const { NjFile } = require('njfile')
+const { NjFile, NjFiles } = require('njfile')
 const { spawn } = require('child_process')
 
 class NjReloader extends NjWatch {
     constructor(dt, objx) {
         super(dt, objx)
+
         for (const nm in this.dt) {
             for (const i in this.dt[nm].dirs) {
                 const folder = this.dt[nm].dirs[i].split('/').pop()
                 for (const i in this.fls[folder]) {
-                    if (this.fls[folder][i] instanceof NjFile) {
+                    if (this.fls[folder][i] instanceof NjFiles) {
+   
+                        for (const l in this.fls[folder][i]) {
+                            if ( this.fls[folder][i][l] instanceof NjFile) {
+                                this.fls[folder][i][l].add([nm], 'entity')
+                            }
+                            
+                        }
+                    } else if (this.fls[folder][i] instanceof NjFile) {
                         this.fls[folder][i].add([nm], 'entity')
-                    }
+                    } 
                 }
             }
         }
+        
 
     }
 

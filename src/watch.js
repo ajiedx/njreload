@@ -43,6 +43,20 @@ class NjWatch extends NjSuper {
                         }
                     }
                     this.fls[i][l].updateTime()
+                } else if (this.fls[i][l] instanceof NjFiles) {
+                    for (const y in this.fls[i][l]) {
+                        if (this.fls[i][l][y] instanceof NjFile) {
+                            if (this.fls[i][l][y].isEdited()) {
+                                for (const key in this.fls[i][l][y].entity) {
+        
+                                    this[this.fls[i][l][y].entity[key]].rsp(this.fls[i][l][y])
+                                }
+                            }
+                            this.fls[i][l][y].updateTime()
+                        }
+                        
+                    }
+                    
                 }
             }
         }
