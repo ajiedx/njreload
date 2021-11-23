@@ -31,10 +31,12 @@ class NjReloader extends NjWatch {
 
     set(name, res) {
         for (const i in this.dt) {
-            console.log(i)
+
             if(name === i) {
                 if (res === 'restartServer') {
                     this[name].add(this.restartServer, 'rsp')
+                } else if (res === 'updateJs') {
+                    this[name].add(this.updateJs, 'rsp')
                 } else {
                     this[name].add(res, 'rsp')
 
@@ -42,6 +44,34 @@ class NjReloader extends NjWatch {
 
             }
         }
+    }
+
+    updateJs(file) {
+        this.backOpt = {
+            hostname: this.localhost,
+            port: this.port,
+            path: '/jinload',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'text/javascript',
+                'jinreload': file.name + '/' + file.editedMs
+            }
+        }
+
+        this.clconn = http.request(
+            this.backOpt,
+            (rsp) => {
+                rsp.setEncoding('utf8');
+                rsp.on('data', (d) => {
+                    process.stdout.write(d);
+                });
+            })
+        this.clconn.on('error', (e) => {
+            console.error(e);
+        });
+
+        this.clconn.end()
+
     }
 
     restartServer(file) {
@@ -56,7 +86,6 @@ class NjReloader extends NjWatch {
             }
         }
 
-        console.log(this)
         this.clconn = http.request(
             this.backOpt,
             (rsp) => {
