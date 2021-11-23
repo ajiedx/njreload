@@ -1,6 +1,6 @@
 {
   "name": "njreloader",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Livereload for Nodejs and NjNest",
   "main": "njreloader.js",
   "scripts": {
