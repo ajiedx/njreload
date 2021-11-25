@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/ajiedx/njreloader#readme",
   "dependencies": {
-    "njfile": "^1.0.5",
-    "njsuper": "^1.0.0"
+    "njfile": "^1.2.2",
+    "njsuper": "^1.0.2"
   }
 }

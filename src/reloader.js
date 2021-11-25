@@ -92,8 +92,7 @@ class NjReloader extends NjWatch {
                 rsp.setEncoding('utf8');
                 rsp.on('data', (d) => {
                     process.stdout.write(d);
-                    
-                    
+
                 });
             })
         this.clconn.on('error', (e) => {
@@ -102,19 +101,20 @@ class NjReloader extends NjWatch {
 
         this.clconn.end()
 
-        const bat = spawn('cmd.exe', ['/c', this.batch], { shell: true })
+        const bat = spawn('cmd.exe', ['/c', '@echo off | ', this.batch], { shell: true })
 
         bat.stdout.on('data', (data) => {
-            console.log(data.toString())
-        });
+
+            data.toString()
+        })
 
         bat.stderr.on('data', (data) => {
             console.error(data.toString())
         });
 
         bat.on('exit', (code) => {
-            console.log(`Child exited with code ${code}`)
-        });
+            // console.log(`Child exited with code ${code}`)
+        })
     }
 
 }
