@@ -45,6 +45,7 @@ class NjWatch extends NjSuper {
                         for (const key in this.fls[i][l].entity) {
                             const colored = '"' + this.fls[i][l].name + '.' + this.fls[i][l].ext + '"'
                             console.log('\x1b[32m%s\x1b[0m', 'Found update on',  '\x1b[37m', colored, '\x1b[0m', '\x1b[32m', 'file.', '\x1b[0m')
+
                             this[this.fls[i][l].entity[key]].rsp(this.fls[i][l])
                         }
                     }
