@@ -12,7 +12,7 @@ class NjReload extends NjWatch {
                 const folder = this.dt[nm].dirs[i].split('/').pop()
                 for (const i in this.fls[folder]) {
                     if (this.fls[folder][i] instanceof NjFiles) {
-   
+
                         for (const l in this.fls[folder][i]) {
                             if ( this.fls[folder][i][l] instanceof NjFile) {
                                 this.fls[folder][i][l].add([nm], 'entity')
@@ -31,22 +31,36 @@ class NjReload extends NjWatch {
 
     set(name, res) {
         for (const i in this.dt) {
-
             if(name === i) {
+                if (this.dt[i].response) {
+                    this[name].add(this.dt[i].response, 'response')
+                    
+                }
+
                 if (res === 'restartServer') {
                     this[name].add(this.restartServer, 'rsp')
                 } else if (res === 'jinupdate') {
                     this[name].add(this.update, 'rsp')
                 } else {
-                    this[name].add(res, 'rsp')
-
+                    this[name].add(this.rsp, 'rsp')
                 }
+            } 
+        }
+    }
 
-            }
+    rsp(file) {
+        if (this.response) {
+            this.response(file)
+        } else {
+            console.log('No Response have been provided')
         }
     }
 
     update(file) {
+        if (this.response) {
+            this.response(file)
+        }
+
         const clconn = net.createConnection({
             host: this.localhost,
             port: this.port,
@@ -57,6 +71,28 @@ class NjReload extends NjWatch {
     }
 
     restartServer(file) {
+        if (this.response) {
+            this.response(file)
+        } 
+
+        const windows = (batch) => {
+            const bat = spawn('cmd.exe', ['/c', '@echo off | ', batch], { shell: true })
+
+            bat.stdout.on('data', (data) => {
+    
+                data.toString()
+            })
+    
+            bat.stderr.on('data', (data) => {
+                console.error(data.toString())
+            });
+    
+            bat.on('exit', (code) => {
+    
+                // console.log(`Child exited with code ${code}`)
+            })
+        }
+
         const clconn = net.createConnection({
             host: this.localhost,
             port: this.port,
@@ -64,22 +100,20 @@ class NjReload extends NjWatch {
             clconn.write('RELOAD ' + file.name + '.' + file.ext + ' LOCAL/0.2')
             clconn.end()
         })
-
-
-        const bat = spawn('cmd.exe', ['/c', '@echo off | ', this.batch], { shell: true })
-
-        bat.stdout.on('data', (data) => {
-
-            data.toString()
+        
+        clconn.on('data', (data) => {
+            console.log('Restarting the server')
+            clconn.end()
+            windows(this.batch)
         })
 
-        bat.stderr.on('data', (data) => {
-            console.error(data.toString())
-        });
-
-        bat.on('exit', (code) => {
-
-            // console.log(`Child exited with code ${code}`)
+        clconn.on('error', (err) => {
+            if (err.code === 'ECONNREFUSED') {
+                console.log('Server is down, starting...')
+                setTimeout(() => {
+                    windows(this.batch)
+                }, 250)
+            }
         })
 
 
