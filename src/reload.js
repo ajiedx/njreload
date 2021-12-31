@@ -8,8 +8,10 @@ class NjReload extends NjWatch {
         super(dt, objx)
 
         for (const nm in this.dt) {
+            console.log(nm)
             for (const i in this.dt[nm].dirs) {
                 const folder = this.dt[nm].dirs[i].split('/').pop()
+                console.log(folder)
                 for (const i in this.fls[folder]) {
                     if (this.fls[folder][i] instanceof NjFiles) {
 
@@ -17,26 +19,21 @@ class NjReload extends NjWatch {
                             if ( this.fls[folder][i][l] instanceof NjFile) {
                                 this.fls[folder][i][l].add([nm], 'entity')
                             }
-                            
+
                         }
                     } else if (this.fls[folder][i] instanceof NjFile) {
                         this.fls[folder][i].add([nm], 'entity')
-                    } 
+                    }
                 }
             }
         }
-        
+
 
     }
 
     set(name, res) {
         for (const i in this.dt) {
             if(name === i) {
-                if (this.dt[i].response) {
-                    this[name].add(this.dt[i].response, 'response')
-                    
-                }
-
                 if (res === 'restartServer') {
                     this[name].add(this.restartServer, 'rsp')
                 } else if (res === 'jinupdate') {
@@ -44,7 +41,7 @@ class NjReload extends NjWatch {
                 } else {
                     this[name].add(this.rsp, 'rsp')
                 }
-            } 
+            }
         }
     }
 
@@ -73,22 +70,22 @@ class NjReload extends NjWatch {
     restartServer(file) {
         if (this.response) {
             this.response(file)
-        } 
+        }
 
         const windows = (batch) => {
             const bat = spawn('cmd.exe', ['/c', '@echo off | ', batch], { shell: true })
 
             bat.stdout.on('data', (data) => {
-    
+
                 data.toString()
             })
-    
+
             bat.stderr.on('data', (data) => {
                 console.error(data.toString())
             });
-    
+
             bat.on('exit', (code) => {
-    
+
                 // console.log(`Child exited with code ${code}`)
             })
         }
@@ -100,7 +97,7 @@ class NjReload extends NjWatch {
             clconn.write('RELOAD ' + file.name + '.' + file.ext + ' LOCAL/0.2')
             clconn.end()
         })
-        
+
         clconn.on('data', (data) => {
             console.log('Restarting the server')
             clconn.end()
@@ -108,6 +105,7 @@ class NjReload extends NjWatch {
         })
 
         clconn.on('error', (err) => {
+            console.log(err.code)
             if (err.code === 'ECONNREFUSED') {
                 console.log('Server is down, starting...')
                 setTimeout(() => {
