@@ -1,6 +1,6 @@
 const { NjSuper } = require('njsuper')
 const { NjFile, NjFiles } = require('njfile')
-const { spawnSync, spawn, exec } = require('child_process')
+const { exec } = require('child_process')
 
 class NjWatch extends NjSuper {
     constructor(dt, objx, t) {
@@ -23,17 +23,67 @@ class NjWatch extends NjSuper {
                         reloader: 'njreload',
                         batch: cmd,
                         name: i,
+                        njwatch: this.dt,
                         script: this.packages.njreload[i],
-                        response: function (file) {
+                        response: function (rec) {
+                            const scriptRun = (p, s, recur) => {
+                                if (recur) {
+                                    if (recur[recur[0]].length - 1 > 0) {
+                                        p = '/node_modules/' + this.name
+                                        s = recur[recur[0]][1]
+                                        exec('cd '+process.cwd()+ p +' && node ' + s,
+                                        (error, stdout, stderr) => {
+                                        if (error) {
+                                            console.error(`exec error: ${error}`)
+                                            return
+                                        }
+                                        console.log('\x1b[91m%s\x1b[0m', `${p}/${s}`, `stdout: \n${stdout}`)
+                                        recur[0] = recur[0] + 1
+                                        if(recur[recur[0]]) this.njwatch[recur[recur[0]][0]].response(recur)
+                                       })
+                                    } else {
+                                        exec('cd '+process.cwd()+ p +' && node ' + s,
+                                        (error, stdout, stderr) => {
+                                         if (error) {
+                                           console.error(`exec error: ${error}`)
+                                           return
+                                         }
+                                        console.log('\x1b[91m%s\x1b[0m', `${p}/${s}`, `stdout: \n${stdout}`)
+                                        recur[0] = recur[0] + 1
+                                        if(recur[recur[0]]) this.njwatch[recur[recur[0]][0]].response(recur)
+                                       })
+                                    }
+                                } else {
+                                    exec('cd '+process.cwd()+ p +' && node ' + s,
+                                    (error, stdout, stderr) => {
+                                        if (error) {
+                                            console.error(`exec error: ${error}`)
+                                            return
+                                        }
+                                        console.log('\x1b[91m%s\x1b[0m', `${p}/${s}`, `stdout: \n${stdout}`)
+                                    })
+                                }
+                            }
 
-                            exec('cd '+process.cwd()+'/node_modules/' + this.name + ' && node ' + this.script, (error, stdout, stderr) => {
-                              if (error) {
-                                console.error(`exec error: ${error}`)
-                                return
-                              }
-                              console.log('\x1b[91m%s\x1b[0m', `${this.name}/${this.script}`, `stdout: \n${stdout}`)
+                            if (Array.isArray(rec)) {
+                                scriptRun('/node_modules/'+this.name, this.script, rec)
+                            } else
+                            if (this.script.includes(',')) {
+                                let scripts = this.script.split(',')
+                                let path = [1]
+                                for (const i in scripts) {
+                                    if (scripts[i].includes('.js')) {
+                                        path.push([this.name+'_node', scripts[i]])
+                                    } else {
+                                        path.push([scripts[i].trim()+'_node'])
+                                    }
+                                }
 
-                            })
+                                scriptRun('', '', path)
+                            } else {
+                                scriptRun('/node_modules/'+this.name, this.script)
+                            }
+
                         } }
                 } else {
                     packagedirs[i+'_node'] =  {
@@ -94,7 +144,7 @@ class NjWatch extends NjSuper {
                             this[this.fls[i][l].entity[key]].rsp(this.fls[i][l])
                         }
                     }
-                } 
+                }
             }
         }
     }
